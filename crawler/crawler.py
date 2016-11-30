@@ -41,7 +41,7 @@ def main():
     	# print stock_dict
 
 
-    file_name = './data/stock_data_' + time.strftime("%Y-%m-%d %X", time.localtime())
+    file_name = './data/stock_data_' + time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
     stock_data = open(file_name, "w+")
     stock_data.write(str(stock_dict))
     stock_data.close()

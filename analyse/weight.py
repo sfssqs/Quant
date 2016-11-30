@@ -77,7 +77,7 @@ def main():
 
 
 	''' Save To File '''
-	file_name = './data/stock_weight_' + time.strftime("%Y-%m-%d %X", time.localtime())
+	file_name = './data/stock_weight_' + time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
 	stock_weight = open(file_name, "w+")
 
 	weight_list = sorted(stock_weight_dict.items(), lambda x, y: cmp(x[1], y[1]), reverse=True)
