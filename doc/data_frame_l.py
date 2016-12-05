@@ -87,3 +87,20 @@ print df3
 ''' Set value by numpy '''
 df3.loc[:, 'D'] = np.array([5] * len(df3))
 print df3
+
+print '-------------------------------------'
+print ''' IO Input/Output '''
+df4 = pd.DataFrame(np.random.randn(6, 4), index=dates, columns=list('ABCD'))
+print df4
+
+print '\n'
+df4.to_csv('foo.csv')
+print pd.read_csv('foo.csv')
+
+print '\n'
+df4.to_hdf('foo.h5','df')
+print pd.read_hdf('foo.h5','df')
+
+print '\n'
+df4.to_excel('foo.xlsx', sheet_name='Sheet1')
+print pd.read_excel('foo.xlsx', 'Sheet1', index_col=None, na_values=['NA'])

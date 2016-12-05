@@ -16,28 +16,28 @@ def main():
     global stock_dict
 
     for item in line:
-    	pack_content = pack.get_content(pack.get_url((item)))
+                pack_content = pack.get_content(pack.get_url((item)))
     	roe_content = roe.get_content(roe.get_url((item)))
-        profit_year_content = profit_year.get_content(profit_year.get_url(item))
+                profit_year_content = profit_year.get_content(profit_year.get_url(item))
 
     	# print '\n\n'
     	# print pack.get_date_data(pack_content)
     	# print pack.get_profit_data(pack_content)
     	# print pack.get_revenue_data(pack_content)
     	# print roe.get_roe_data(roe_content)
-        # print profit_year.get_profit_data(profit_year_content)
+                # print profit_year.get_profit_data(profit_year_content)
 
     	stock_list = []
     	stock_list.append(pack.get_date_data(pack_content))
     	stock_list.append(pack.get_profit_data(pack_content))
     	stock_list.append(pack.get_revenue_data(pack_content))
     	stock_list.append(roe.get_roe_data(roe_content))
-        stock_list.append(profit_year.get_profit_data(profit_year_content))
+                stock_list.append(profit_year.get_profit_data(profit_year_content))
     	# print stock_list
 
     	global stock_dict
     	stock_dict[item] = stock_list
-        print 'INFO: Crawling stock [' + item +']'
+                print 'INFO: Crawling stock [' + item +']'
     	# print stock_dict
 
 
