@@ -5,6 +5,7 @@ import time
 import os
 import shutil
 import StringIO
+import tools
 
 date_base = datetime.date.today()
 global date_base
@@ -106,5 +107,55 @@ if __name__ == '__main__':
 		else:
 			print 'ERROR: ' + str(file_name) + ' is not exist!'
 
+	total_dict = {}
+	
+	q1_dict = {}
+	q2_dict = {}
+	q3_dict = {}
+	q4_dict = {}
+
 	for key, value in price_dict.items():
-		print str(key) + ' ' + str(value)
+		q1_dict[key] = value[0][0]
+		q2_dict[key] = value[0][1]
+		q3_dict[key] = value[0][2]
+		q4_dict[key] = value[0][3]
+
+	q1_weight = tools.get_weight(q1_dict)
+	q2_weight = tools.get_weight(q2_dict)
+	q3_weight = tools.get_weight(q3_dict)
+	q4_weight = tools.get_weight(q4_dict)
+
+	for key, value in price_dict.items():
+		print '---------------------------------------------------------------------'
+		# print key + '	' + str(value)
+		# print key + '	' + str(q1_dict[key]) + '	' + str(q1_weight[key])
+		# print key + '	' + str(q2_dict[key]) + '	' + str(q2_weight[key])
+		# print key + '	' + str(q3_dict[key]) + '	' + str(q3_weight[key])
+		# print key + '	' + str(q4_dict[key]) + '	' + str(q4_weight[key])
+
+		final_weight = (q1_weight[key] * 40 + q2_weight[key] * 20 + q3_weight[key] * 20 + q1_weight[key] * 20) / 100
+		total_dict[key] = round(final_weight, 5)
+
+		total_list = []
+		total_list.append(q1_weight[key])
+		total_list.append(q2_weight[key])
+		total_list.append(q3_weight[key])
+		total_list.append(q4_weight[key])
+		total_list.append(total_dict[key])
+		
+		print key + '	' + str(value)
+		print key + '	' + str(total_list)
+
+		# time.sleep(1)
+
+	print '=========================================================================='
+	weight_list = sorted(total_dict.items(), lambda x, y: cmp(x[1], y[1]), reverse=True)
+	for item in weight_list:
+		temp = str(item[0]) + '		' + str(item[1]) + '\n'
+		print str(item[0]) + '		' + str(item[1])
+
+
+
+
+
+
