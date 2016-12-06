@@ -133,23 +133,35 @@ if __name__ == '__main__':
 		# print key + '	' + str(q3_dict[key]) + '	' + str(q3_weight[key])
 		# print key + '	' + str(q4_dict[key]) + '	' + str(q4_weight[key])
 
-		final_weight = (q1_weight[key] * 40 + q2_weight[key] * 20 + q3_weight[key] * 20 + q1_weight[key] * 20) / 100
-		total_dict[key] = round(final_weight, 5)
+		final_weight = (q1_weight[key] * 40 + q2_weight[key] * 20 + q3_weight[key] * 20 + q4_weight[key] * 20) / 100
+		final_weight = round(final_weight, 5)
 
 		total_list = []
-		total_list.append(q1_weight[key])
-		total_list.append(q2_weight[key])
-		total_list.append(q3_weight[key])
-		total_list.append(q4_weight[key])
-		total_list.append(total_dict[key])
 		
-		print key + '	' + str(value)
+
+		weight_list = []
+		weight_list.append(q1_weight[key])
+		weight_list.append(q2_weight[key])
+		weight_list.append(q3_weight[key])
+		weight_list.append(q4_weight[key])
+
+		price = value[1]
+		rate = value[0]
+
+		total_list.append(final_weight)
+		total_list.append(weight_list)
+		total_list.append(rate)
+		total_list.append(price)
+		
+		# print key + '	' + str(value)
 		print key + '	' + str(total_list)
+
+		total_dict[key] = total_list
 
 		# time.sleep(1)
 
 	print '=========================================================================='
-	weight_list = sorted(total_dict.items(), lambda x, y: cmp(x[1], y[1]), reverse=True)
+	weight_list = sorted(total_dict.items(), lambda x, y: cmp(x[1][0], y[1][0]), reverse=True)
 	for item in weight_list:
 		temp = str(item[0]) + '		' + str(item[1]) + '\n'
 		print str(item[0]) + '		' + str(item[1])
