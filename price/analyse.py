@@ -6,8 +6,20 @@ import os
 import shutil
 import StringIO
 
-date_base = datetime.date(2016, 11, 30)
+date_base = datetime.date.today()
 global date_base
+
+def filter_none(data, num):
+	if data is None:
+		return 0.0
+	else:
+		return round(data, num)
+
+def get_rate(new, old):
+	if  new  is None or old is None:
+		return 0.0
+	else:
+		return 100 * (new - old) / old		
 
 def getPricebyData(date, df):
 	global date_base
@@ -30,44 +42,56 @@ def getPrice(date, df):
 	return price
 
 def getPriceArray(stock, date, df):
+	total_array = []
 	price_array = []
+	rate_array = []
 
 	q1  = date
 	q2 = q1 - datetime.timedelta(days=91)
 	q3 = q2 - datetime.timedelta(days=91)
 	q4 = q3 - datetime.timedelta(days=91)
+	q5= q4 - datetime.timedelta(days=91)
 
 	q1_price = 0.0
 	q2_price = 0.0
 	q3_price = 0.0
 	q4_price = 0.0
+	q5_price = 0.0
 
 	q1_price =  getPrice(q1, df)
 	q2_price =  getPrice(q2, df)
 	q3_price =  getPrice(q3, df)
 	q4_price =  getPrice(q4, df)
+	q5_price =  getPrice(q5, df)
 
 	if q4_price  is None:
-		print 'WARNING: '  + stock + ' ' + str(q1_price) + ' ' + str(q2_price) + ' ' + str(q3_price) + ' ' + str(q4_price)
+		print 'WARNING: '  + stock + ' ' + str(q1_price) + ' ' + str(q2_price) + ' ' + str(q3_price) + ' ' + str(q4_price) + ' ' + str(q5_price)
 
-	if q1_price is None:
-		q1_price = 0.0
+	q1_rate = 0.0
+	q2_rate = 0.0
+	q3_rate = 0.0
+	q4_rate = 0.0
 
-	if q2_price is None:
-		q2_price = q1_price
+	q1_rate = get_rate(q1_price, q2_price)
+	q2_rate = get_rate(q2_price, q3_price)
+	q3_rate = get_rate(q3_price, q4_price)
+	q4_rate = get_rate(q4_price, q5_price)
 
-	if q3_price is None:
-		q3_price = q2_price
+	price_array.append(filter_none(q1_price, 2))
+	price_array.append(filter_none(q2_price, 2))
+	price_array.append(filter_none(q3_price, 2))
+	price_array.append(filter_none(q4_price, 2))	
+	price_array.append(filter_none(q5_price, 2))		
 
-	if q4_price  is None:
-		q4_price = q3_price
+	rate_array.append(round(q1_rate, 2))
+	rate_array.append(round(q2_rate, 2))
+	rate_array.append(round(q3_rate, 2))
+	rate_array.append(round(q4_rate, 2))
 
-	price_array.append(round(q1_price, 2))
-	price_array.append(round(q2_price, 2))
-	price_array.append(round(q3_price, 2))
-	price_array.append(round(q4_price, 2))
+	total_array.append(rate_array)
+	total_array.append(price_array)
 
-	return price_array
+	return total_array
 
 if __name__ == '__main__':
 	price_dict = {}
