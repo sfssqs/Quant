@@ -38,7 +38,5 @@ def strBigToFloat(str):
         num = float(str.replace('亿', '')) * 100000000
     else:
         num = float(str)
-
-    
-
+        
     return num

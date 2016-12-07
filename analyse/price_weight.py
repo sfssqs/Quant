@@ -51,7 +51,7 @@ def getPriceArray(stock, date, df):
 	q2 = q1 - datetime.timedelta(days=91)
 	q3 = q2 - datetime.timedelta(days=91)
 	q4 = q3 - datetime.timedelta(days=91)
-	q5= q4 - datetime.timedelta(days=91)
+	q5 = q4 - datetime.timedelta(days=91)
 
 	q1_price = 0.0
 	q2_price = 0.0
@@ -94,12 +94,12 @@ def getPriceArray(stock, date, df):
 
 	return total_array
 
-if __name__ == '__main__':
+def main():
 	price_dict = {}
 
-	line = [line.rstrip() for line in open('../data/stock_list')]
+	line = [line.rstrip() for line in open('data/stock_list')]
 	for item in line:
-		file_name = 'data/' + item + '.csv'
+		file_name = 'data/price/' + item + '.csv'
 		if os.path.exists(file_name):			
 			df = pd.read_csv(file_name, index_col=0)
 			price_array = getPriceArray(item, date_base, df)
@@ -108,7 +108,6 @@ if __name__ == '__main__':
 			print 'ERROR: ' + str(file_name) + ' is not exist!'
 
 	total_dict = {}
-	
 	q1_dict = {}
 	q2_dict = {}
 	q3_dict = {}
@@ -127,18 +126,10 @@ if __name__ == '__main__':
 
 	for key, value in price_dict.items():
 		print '---------------------------------------------------------------------'
-		# print key + '	' + str(value)
-		# print key + '	' + str(q1_dict[key]) + '	' + str(q1_weight[key])
-		# print key + '	' + str(q2_dict[key]) + '	' + str(q2_weight[key])
-		# print key + '	' + str(q3_dict[key]) + '	' + str(q3_weight[key])
-		# print key + '	' + str(q4_dict[key]) + '	' + str(q4_weight[key])
-
 		final_weight = (q1_weight[key] * 40 + q2_weight[key] * 20 + q3_weight[key] * 20 + q4_weight[key] * 20) / 100
 		final_weight = round(final_weight, 5)
 
 		total_list = []
-		
-
 		weight_list = []
 		weight_list.append(q1_weight[key])
 		weight_list.append(q2_weight[key])
@@ -153,21 +144,29 @@ if __name__ == '__main__':
 		total_list.append(rate)
 		total_list.append(price)
 		
-		# print key + '	' + str(value)
 		print key + '	' + str(total_list)
-
 		total_dict[key] = total_list
 
-		# time.sleep(1)
-
 	print '=========================================================================='
+
+	''' Save To File '''
+	file_name = './data/price/price_weight_' + time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+	stock_weight = open(file_name, "w+")
+
 	weight_list = sorted(total_dict.items(), lambda x, y: cmp(x[1][0], y[1][0]), reverse=True)
 	for item in weight_list:
-		temp = str(item[0]) + '		' + str(item[1]) + '\n'
-		print str(item[0]) + '		' + str(item[1])
+		temp = []
+		temp.append(item[0])
+		temp.append(item[1][0])
+		stock_weight.write(str(temp) + '\n')
+	stock_weight.close()
+	print 'INFO: New Stock File [' + file_name + ']'		
 
+	file_name_new = './data/price/price_weight_new'
+	if os.path.isfile(file_name_new):
+		print 'INFO: Delete File [' + file_name_new + ']'
+		os.remove(file_name_new)
+		time.sleep(2)
 
-
-
-
-
+	print 'INFO: Copy File From [' + file_name + '] To [' + file_name_new + ']'
+	shutil.copy(file_name, file_name_new)		

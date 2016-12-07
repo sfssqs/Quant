@@ -15,7 +15,7 @@ import profit_weight
 def main():
 	stock_dict = {}
 
-	file_name = './data/stock_data_new'
+	file_name = './data/growth/stock_data_new'
 	stock_data = open(file_name, "rw+")
 	stock_dict = eval(stock_data.read())
 	stock_data.close()
@@ -73,25 +73,27 @@ def main():
 
 		profit_total_weight = (cur_q_profit * 40 + last_q_profit * 30 + last_y_profit * 30) / 100
 		total_weight = (profit_total_weight * 50 + revenue * 30 + roe * 20) / 100
-		stock_weight_dict[key] = total_weight
+		stock_weight_dict[key] = round(total_weight, 5)
 
 
 	''' Save To File '''
-	file_name = './data/stock_weight_' + time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+	file_name = './data/growth/stock_weight_' + time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
 	stock_weight = open(file_name, "w+")
 
 	weight_list = sorted(stock_weight_dict.items(), lambda x, y: cmp(x[1], y[1]), reverse=True)
 	for item in weight_list:
-		temp = str(item[0]) + '		' + str(item[1]) + '\n'
-		stock_weight.write(temp)
+		temp = []
+		temp.append(item[0])
+		temp.append(item[1])
+		stock_weight.write(str(temp) + '\n')
 	stock_weight.close()
 	print 'INFO: New Stock File [' + file_name + ']'
 
-	file_name_new = './data/stock_weight_new'
+	file_name_new = './data/growth/stock_weight_new'
 	if os.path.isfile(file_name_new):
-	    print 'INFO: Delete File [' + file_name_new + ']'
-	    os.remove(file_name_new)
-	    time.sleep(2)
+		print 'INFO: Delete File [' + file_name_new + ']'
+		os.remove(file_name_new)
+		time.sleep(2)
 
 	print 'INFO: Copy File From [' + file_name + '] To [' + file_name_new + ']'
 	shutil.copy(file_name, file_name_new)
