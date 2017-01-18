@@ -1,27 +1,42 @@
 #coding=utf-8  
 #!/usr/bin/python
 
+import sys
+sys.path.append("..")
+
+import tushare as ts
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import time
 
-RESISTANCE_FACTOR = 0.3
+from enum import Enum
+from utils import logger as log
 
-def _filter(data):
-    filter_data = data.loc[:, ['open', 'high', 'close','low']]
-    filter_data['price_change'] = filter_data.close - filter_data.open
-    return filter_data
+RESISTANCE_FACTOR = 0.3
+logger = log.Logger()
+
+class FilterType(Enum):
+    local = 1
+    server = 2
+
+def _normalize(data, type):
+    if type == FilterType.local:
+        filter_data = data.loc[:, ['open', 'high', 'close','low']]
+        filter_data['price_change'] = filter_data.close - filter_data.open
+        return filter_data
+    elif type == FilterType.server:
+        filter_data = data.loc[:, ['date', 'open', 'high', 'close','low']]
+        filter_data['price_change'] = filter_data.close - filter_data.open
+        filter_data = filter_data.set_index(['date'])
+        return filter_data
 
 def _resistance(data):
-    fall_data = data[data.price_change < 0]
-    print fall_data
-    print '================================================='
-
+    fall_data = data[data.price_change <= 0]
     for index, row in fall_data.iterrows():
         ref_data = data[:index].drop([index], axis=0)
         result = _calculate_single_resistance(row, ref_data)
-        print '[' + str(index) + '] ' + str(result)
+        logger.info('[' + str(index) + '] ' + str(result))
 
 def _calculate_single_resistance(single_data, data):
     factor_value = abs(single_data.price_change) * RESISTANCE_FACTOR
@@ -33,36 +48,65 @@ def _calculate_single_resistance(single_data, data):
     return True
 
 def _support(data):
-    rise_data = data[data.price_change > 0]
-    print rise_data
-    print '================================================='
-
+    rise_data = data[data.price_change >= 0]
     for index, row in rise_data.iterrows():
         ref_data = data[:index].drop([index], axis=0)
         result = _calculate_single_support(row, ref_data)
-        print '[' + str(index) + '] ' + str(result)
+        logger.info('[' + str(index) + '] ' + str(result))
 
 def _calculate_single_support(single_data, data):
     factor_value = abs(single_data.price_change) * RESISTANCE_FACTOR
     ref_price = single_data.close - round(factor_value, 2)
     for index, row in data.iterrows():
-        if row.low < ref_price:        
+        if row.low < ref_price:
             return False
 
     return True
 
+'''
+    注意：
+    目前程序默认需要从现在到过去的排序
+    get_k_data: 获取到的数据从过去到现在排序
+    get_h_data: 获取到的数据从现在到过去排序
 
-df = pd.read_csv('../price/data/600035.csv', index_col='date')
-dfhead = df['2016-11-28':'2016-11-10']
-# dfhead = df.head(500)
-filter_data = _filter(dfhead)
+    -------------------------------------
 
-print filter_data
-print '================================================='
+    param: stockId, 600035
+    param: period, 'D', 'W', 'M', 'Q', 'Y'
+    param: start, 2016-10-10
+    param: end, 2017-10-10
+'''
+def _fetch_source_data(stockId):
+    df = ts.get_k_data(stockId, start='2016-07-06', end='2017-01-17', ktype='W', autype='qfq')
+    # dfhead = df['2016-11-28':'2016-11-10']
+    dfhead = df
+    normalize_data = _normalize(dfhead, FilterType.server)
+    reverse_data = normalize_data.reindex(index=normalize_data.index[::-1]).copy()
+    
+    logger.info('resistance')
+    logger.info('-----------------------------')
+    _resistance(reverse_data)
+    logger.info('=============================')
+    logger.info('support')
+    logger.info('-----------------------------')
+    _support(reverse_data)
+
+_fetch_source_data('000043')
+
+
+
+##########################################################################
+# df = ts.get_h_data('000043', start='2017-01-16', ktype='W')
+# df = pd.read_csv('../price/data/600035.csv', index_col='date')
+# dfhead = df['2016-11-28':'2016-11-10']
+# # dfhead = df.head(500)
+# filter_data = _normalize(dfhead, FilterType.local)
+
+# print filter_data
+# print '================================================='
 # _resistance(filter_data)
 # print '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
-_support(filter_data)
-
+# _support(filter_data)
 
 ##########################################################################
 # 截取数据，最新50周
